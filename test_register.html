@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Test Inscription</title>
+</head>
+<body>
+  <h1>Formulaire d'inscription</h1>
+
+  <form id="registerForm">
+    <label>Nom : <input type="text" name="last_name" required /></label><br />
+    <label>Prénom : <input type="text" name="first_name" required /></label><br />
+    <label>Email : <input type="email" name="email" required /></label><br />
+    <label>Date de naissance : <input type="date" name="birth_date" required /></label><br />
+    <label>Mot de passe : <input type="password" name="password" required /></label><br />
+    <label>Sexe :
+      <select name="gender" required>
+        <option value="">--Choisir--</option>
+        <option value="Male">Homme</option>
+        <option value="Female">Femme</option>
+        <option value="Other">Autre</option>
+      </select>
+    </label><br />
+    <label>Adresse : <input type="text" name="address" /></label><br />
+    <label>Ville : <input type="text" name="city" /></label><br />
+    <label>Code postal : <input type="text" name="postal_code" /></label><br />
+    <label>Pays : <input type="text" name="country" /></label><br />
+    <label>Téléphone : <input type="text" name="phone" /></label><br />
+
+    <button type="submit">S'inscrire</button>
+  </form>
+
+  <div id="result"></div>
+
+  <script>
+    const form = document.getElementById('registerForm');
+    const resultDiv = document.getElementById('result');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Récupérer les données du formulaire
+      const formData = new FormData(form);
+      const data = {};
+      formData.forEach((value, key) => {
+        data[key] = value;
+      });
+
+      try {
+        const response = await fetch('http://localhost:8085/index.php/register', {  // adapte cette URL à ton backend
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        const json = await response.json();
+
+        if(json.return === 0) {
+          resultDiv.style.color = 'green';
+          resultDiv.textContent = json.message;
+        } else {
+          resultDiv.style.color = 'red';
+          resultDiv.textContent = json.message;
+        }
+      } catch (error) {
+        resultDiv.style.color = 'red';
+        resultDiv.textContent = 'Erreur réseau ou serveur.';
+      }
+    });
+  </script>
+</body>
+</html>

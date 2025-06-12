@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Test Connexion</title>
+</head>
+<body>
+  <h1>Formulaire de Connexion</h1>
+
+  <form id="loginForm">
+    <label>Email : <input type="email" name="email" required /></label><br />
+    <label>Mot de passe : <input type="password" name="password" required /></label><br />
+    <button type="submit">Se connecter</button>
+  </form>
+
+  <div id="result"></div>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const resultDiv = document.getElementById('result');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+      const data = {};
+      formData.forEach((value, key) => {
+        data[key] = value;
+      });
+
+        const response = await fetch('http://localhost:8085/index.php/login', {  // <-- adapte le chemin si besoin
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        const text = await response.text();
+        console.log("Réponse brute du backend:", text);
+        const json = JSON.parse(text); 
+
+        if(json.return === 0) {
+          resultDiv.style.color = 'green';
+          resultDiv.textContent = json.message + " (user id : " + json.user_id + ")";
+        } else {
+          resultDiv.style.color = 'red';
+          resultDiv.textContent = json.message;
+        }
+
+    });
+  </script>
+</body>
+</html>
