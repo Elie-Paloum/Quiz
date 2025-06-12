@@ -1,0 +1,61 @@
+# version: '3.8'
+
+# Services
+services:
+
+    # PHP Service
+    php:
+        build:
+            dockerfile: php-dockerfile
+        volumes:
+            - './php-files:/var/www/html'
+        depends_on:
+            - mariadb
+
+    # Nginx Service
+    nginx:
+        image: nginx:latest
+        ports:
+            - 8085:80
+        links:
+            - 'php'
+        volumes:
+            - './php-files:/var/www/html'
+            - './nginx-conf:/etc/nginx/conf.d'
+        depends_on:
+            - php
+
+    # MariaDB Service
+    mariadb:
+        image: mariadb:10.9
+        environment:
+            MYSQL_ROOT_PASSWORD: adminmariadb
+  #          MYSQL_DATABASE: basetest
+        volumes:
+            - './mysql-data:/var/lib/mysql'
+
+    # phpMyAdmin Service
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin:latest
+        ports:
+            - 8080:80
+        environment:
+            PMA_HOST: mariadb
+        depends_on:
+            - mariadb
+        
+    react:
+      build:
+        context: ./react-app
+        dockerfile: Dockerfile
+      ports:
+        - "5173:5173"
+      volumes:
+        - ./react-app:/app
+      stdin_open: true
+      tty: true
+     
+
+# Volumes
+volumes:
+    mysqldata:
