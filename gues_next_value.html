@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz des Séquences Logiques 🔢</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2rem;
+            color: #ffeaa7;
+        }
+        select, input[type="number"], input[type="text"] {
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            margin: 10px;
+            width: 60%;
+            outline: none;
+        }
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            background: #ff7675;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+        button:hover {
+            background: #d63031;
+        }
+        #sequence {
+            font-size: 1.5rem;
+            margin: 20px 0;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #55efc4;
+        }
+        .reset-btn {
+            margin-top: 20px;
+            background: #00cec9;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🔢 Quiz des Séquences Logiques</h1>
+
+    <div id="setup">
+        <p>Sélectionnez le niveau :</p>
+        <select id="level">
+            <option value="1">Niveau 1 : Arithmétique</option>
+            <option value="2">Niveau 2 : Géométrique</option>
+            <option value="3">Niveau 3 : Alternée</option>
+            <option value="4">Niveau 4 : Complexe</option>
+        </select>
+
+        <p>Nombre de questions :</p>
+        <input type="number" id="numQuestions" min="1" max="20" value="5">
+
+        <br><button onclick="startQuiz()">Commencer 🚀</button>
+    </div>
+
+    <div id="quiz" style="display:none;">
+        <div id="sequence"></div>
+        <input type="number" id="answer" placeholder="Votre réponse">
+        <br><button onclick="submitAnswer()">Valider</button>
+        <div id="result"></div>
+        <button class="reset-btn" onclick="resetQuiz()">Nouvelle Partie 🔄</button>
+    </div>
+</div>
+
+<script>
+    let level, totalQuestions, currentQuestion = 0, score = 0;
+    let correctAnswer = 0;
+    let explanation = "";
+
+    function startQuiz() {
+        level = parseInt(document.getElementById("level").value);
+        totalQuestions = parseInt(document.getElementById("numQuestions").value);
+        currentQuestion = 0;
+        score = 0;
+        document.getElementById("setup").style.display = "none";
+        document.getElementById("quiz").style.display = "block";
+        nextQuestion();
+    }
+
+    function nextQuestion() {
+        if (currentQuestion >= totalQuestions) {
+            showResult();
+            return;
+        }
+        document.getElementById("result").innerHTML = "";
+        generateSequence();
+        document.getElementById("answer").value = "";
+        document.getElementById("answer").focus();
+    }
+
+    function generateSequence() {
+        let seq = [];
+        let n = 4;
+
+        if (level === 1) {
+            let a = Math.floor(Math.random() * 20);
+            let d = Math.floor(Math.random() * 10 + 1);
+            for (let i = 0; i < n; i++) seq.push(a + i * d);
+            correctAnswer = a + n * d;
+            explanation = `Suite arithmétique : chaque terme augmente de ${d}.`;
+        } else if (level === 2) {
+            let a = Math.floor(Math.random() * 5 + 1);
+            let r = Math.floor(Math.random() * 3 + 2);
+            for (let i = 0; i < n; i++) seq.push(a * Math.pow(r, i));
+            correctAnswer = a * Math.pow(r, n);
+            explanation = `Suite géométrique : chaque terme est multiplié par ${r}.`;
+        } else if (level === 3) {
+            let a = Math.floor(Math.random() * 20);
+            let d = Math.floor(Math.random() * 5 + 1);
+            for (let i = 0; i < n; i++) seq.push(a + (i % 2 === 0 ? d * i : -d * i));
+            correctAnswer = a + (n % 2 === 0 ? d * n : -d * n);
+            explanation = `Suite alternée : on ajoute ${d}, puis on retire ${d} alternativement.`;
+        } else if (level === 4) {
+            const types = ["square", "cube", "fibonacci"];
+            const choice = types[Math.floor(Math.random() * types.length)];
+            if (choice === "square") {
+                for (let i = 1; i <= n; i++) seq.push(i * i);
+                correctAnswer = (n + 1) * (n + 1);
+                explanation = `Carrés parfaits : ${seq.map((v,i)=> (i+1)+"²").join(", ")}`;
+            } else if (choice === "cube") {
+                for (let i = 1; i <= n; i++) seq.push(i * i * i);
+                correctAnswer = (n + 1) * (n + 1) * (n + 1);
+                explanation = `Cubes parfaits : ${seq.map((v,i)=> (i+1)+"³").join(", ")}`;
+            } else { // Fibonacci
+                seq = [1, 1];
+                for (let i = 2; i < n; i++) seq.push(seq[i-1] + seq[i-2]);
+                correctAnswer = seq[n-1] + seq[n-2];
+                explanation = `Suite de Fibonacci : chaque terme est la somme des deux précédents.`;
+            }
+        }
+
+        document.getElementById("sequence").innerHTML = `Complétez la suite : <br>${seq.join(", ")}, ?`;
+        currentQuestion++;
+    }
+
+    function submitAnswer() {
+        let userAns = parseInt(document.getElementById("answer").value);
+        if (isNaN(userAns)) {
+            alert("Veuillez entrer un nombre valide.");
+            return;
+        }
+
+        if (userAns === correctAnswer) {
+            score++;
+            document.getElementById("result").innerHTML = "<p style='color:lightgreen;'>✔ Bonne réponse !</p>";
+        } else {
+            document.getElementById("result").innerHTML = `<p style='color:#ff7675;'>❌ Mauvaise réponse.<br>La bonne réponse était ${correctAnswer}.<br><em>${explanation}</em></p>`;
+        }
+
+        setTimeout(nextQuestion, 2000);
+    }
+
+    function showResult() {
+        document.getElementById("sequence").innerHTML = `✅ Quiz terminé !<br>Votre score : ${score} / ${totalQuestions} (${Math.round((score/totalQuestions)*100)}%)`;
+        document.getElementById("answer").style.display = "none";
+    }
+
+    function resetQuiz() {
+        document.getElementById("setup").style.display = "block";
+        document.getElementById("quiz").style.display = "none";
+        document.getElementById("answer").style.display = "inline";
+    }
+</script>
+
+</body>
+</html>

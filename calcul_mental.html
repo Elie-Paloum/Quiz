@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz Calcul Mental 🧠</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2rem;
+            color: #ffeaa7;
+        }
+        input[type="number"], select {
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            margin: 10px;
+            width: 80%;
+            outline: none;
+        }
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            background: #ff7675;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+        button:hover {
+            background: #d63031;
+        }
+        #question {
+            font-size: 1.5rem;
+            margin: 20px 0;
+        }
+        #timer {
+            font-size: 1.2rem;
+            margin: 10px 0;
+        }
+        #feedback {
+            font-size: 1.3rem;
+            margin: 15px 0;
+            color: #ffeaa7;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #55efc4;
+        }
+        .reset-btn {
+            margin-top: 20px;
+            background: #00cec9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="setup">
+        <h1>🧮 Quiz Calcul Mental</h1>
+        <p>Nombre de questions :</p>
+        <input type="number" id="nbQuestions" min="1" value="5" />
+        <p>Niveau :</p>
+        <select id="level">
+            <option value="1">Niveau 1 (additions/soustractions - 2 nombres)</option>
+            <option value="2">Niveau 2 (additions/soustractions - 3 nombres)</option>
+            <option value="3">Niveau 3 (multiplications/divisions - 2 nombres)</option>
+            <option value="4">Niveau 4 (tout combiné - 3 nombres)</option>
+        </select>
+        <br>
+        <button onclick="startQuiz()">Lancer le quiz</button>
+    </div>
+
+    <div class="container" id="quiz" style="display:none;">
+        <div id="question"></div>
+        <input type="number" id="answer" placeholder="Votre réponse" />
+        <br>
+        <button onclick="submitAnswer()">Valider</button>
+        <div id="timer"></div>
+        <div id="feedback"></div>
+    </div>
+
+    <div class="container" id="summary" style="display:none;">
+        <h1>Résultat 🏆</h1>
+        <div id="result"></div>
+        <button class="reset-btn" onclick="resetGame()">Nouvelle Partie 🔄</button>
+    </div>
+
+    <script>
+        let questions = [];
+        let current = 0;
+        let score = 0;
+        let timer;
+        let countdown = 10;
+
+        function startQuiz() {
+            const total = parseInt(document.getElementById("nbQuestions").value);
+            const level = parseInt(document.getElementById("level").value);
+            if (isNaN(total) || total <= 0) {
+                alert("Entrez un nombre de questions valide.");
+                return;
+            }
+            questions = generateQuestions(total, level);
+            score = 0;
+            current = 0;
+            document.getElementById("setup").style.display = "none";
+            document.getElementById("summary").style.display = "none";
+            document.getElementById("quiz").style.display = "block";
+            showQuestion();
+        }
+
+        function resetGame() {
+            document.getElementById("setup").style.display = "block";
+            document.getElementById("quiz").style.display = "none";
+            document.getElementById("summary").style.display = "none";
+        }
+
+        function generateQuestions(total, level) {
+            let q = [];
+            for (let i = 0; i < total; i++) {
+                let question = createQuestion(level);
+                q.push(question);
+            }
+            return q;
+        }
+
+        function createQuestion(level) {
+            let expr = "";
+            let result = 0;
+            const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+            if (level === 1) {
+                const a = rand(1, 20), b = rand(1, 20);
+                const op = Math.random() > 0.5 ? "+" : "-";
+                expr = `${a} ${op} ${b}`;
+                result = eval(expr);
+            } else if (level === 2) {
+                const a = rand(1, 20), b = rand(1, 20), c = rand(1, 20);
+                const ops = [Math.random() > 0.5 ? "+" : "-", Math.random() > 0.5 ? "+" : "-"];
+                expr = `${a} ${ops[0]} ${b} ${ops[1]} ${c}`;
+                result = eval(expr);
+            } else if (level === 3) {
+                const a = rand(2, 12), b = rand(2, 12);
+                const op = Math.random() > 0.5 ? "*" : "/";
+                if (op === "*") {
+                    expr = `${a} * ${b}`;
+                    result = a * b;
+                } else {
+                    expr = `${a * b} / ${b}`;
+                    result = a;
+                }
+            } else if (level === 4) {
+                const a = rand(1, 10), b = rand(1, 10), c = rand(1, 10);
+                const ops = ["+", "-", "*", "/"];
+                const op1 = ops[Math.floor(Math.random() * 4)];
+                const op2 = ops[Math.floor(Math.random() * 4)];
+                let expr1 = `${a} ${op1} ${b}`;
+                let tempResult = eval(expr1);
+                if (op2 === "/") {
+                    c = c === 0 ? 1 : c;
+                    expr = `(${expr1}) ${op2} ${c}`;
+                    result = Math.floor(tempResult / c);
+                } else {
+                    expr = `(${expr1}) ${op2} ${c}`;
+                    result = eval(expr);
+                }
+            }
+            return { expr, result: Math.round(result) };
+        }
+
+        function showQuestion() {
+            document.getElementById("answer").value = "";
+            document.getElementById("question").innerText = `Calcul ${current + 1} : ${questions[current].expr}`;
+            document.getElementById("feedback").innerText = "";
+            countdown = 10;
+            document.getElementById("timer").innerText = `Temps restant : ${countdown}s`;
+            timer = setInterval(() => {
+                countdown--;
+                document.getElementById("timer").innerText = `Temps restant : ${countdown}s`;
+                if (countdown <= 0) {
+                    clearInterval(timer);
+                    handleAnswer(null);
+                }
+            }, 1000);
+        }
+
+        function submitAnswer() {
+            let userAns = document.getElementById("answer").value;
+            if (userAns === "") {
+                alert("Entrez une réponse !");
+                document.getElementById("answer").focus();
+                return;
+            }
+            clearInterval(timer);
+            handleAnswer(parseInt(userAns));
+            document.getElementById("answer").focus();
+        }
+
+        function handleAnswer(userAns) {
+            const correct = (userAns === questions[current].result);
+            if (correct) {
+                score++;
+                document.getElementById("feedback").innerText = "✅ Correct !";
+            } else {
+                document.getElementById("feedback").innerText = `❌ Incorrect. La bonne réponse était : ${questions[current].result}`;
+            }
+            setTimeout(() => {
+                current++;
+                if (current >= questions.length) {
+                    showSummary();
+                } else {
+                    showQuestion();
+                }
+            }, 1500);
+        }
+
+        function showSummary() {
+            document.getElementById("quiz").style.display = "none";
+            document.getElementById("summary").style.display = "block";
+            const percent = Math.round((score / questions.length) * 100);
+            document.getElementById("result").innerHTML = `
+                Vous avez répondu correctement à <strong>${score}</strong> sur <strong>${questions.length}</strong> questions.<br>
+                Score final : <strong>${percent}%</strong>
+            `;
+        }
+    </script>
+</body>
+</html>

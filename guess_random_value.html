@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Jeu du Nombre Mystère 🔢</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2rem;
+            color: #ffeaa7;
+        }
+        input[type="number"] {
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            margin: 10px;
+            width: 40%;
+            outline: none;
+        }
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            background: #ff7675;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+        button:hover {
+            background: #d63031;
+        }
+        #message {
+            font-size: 1.2rem;
+            margin: 20px 0;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #55efc4;
+        }
+        .reset-btn {
+            margin-top: 20px;
+            background: #00cec9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔢 Devinez le Nombre !</h1>
+        
+        <div id="range-setup">
+            <p>Choisissez vos bornes :</p>
+            <input type="number" id="min-bound" placeholder="Min" />
+            <input type="number" id="max-bound" placeholder="Max" />
+            <br>
+            <button onclick="startGame()">Lancer le jeu</button>
+        </div>
+
+        <div id="game" style="display:none;">
+            <div id="message"></div>
+            <input type="number" id="input-number" placeholder="Entrez un nombre" />
+            <br>
+            <button onclick="checkGuess()">Vérifier</button>
+            <div id="result"></div>
+            <button class="reset-btn" onclick="resetAll()">Nouvelle Partie 🔄</button>
+        </div>
+    </div>
+
+    <script>
+        let secretNumber, attempts, startTime, endTime, minBound, maxBound;
+
+        function startGame() {
+            minBound = parseInt(document.getElementById("min-bound").value);
+            maxBound = parseInt(document.getElementById("max-bound").value);
+
+            if (isNaN(minBound) || isNaN(maxBound) || minBound >= maxBound) {
+                alert("Veuillez entrer des bornes valides (min < max).");
+                return;
+            }
+
+            secretNumber = Math.floor(Math.random() * (maxBound - minBound + 1)) + minBound;
+            attempts = 0;
+            startTime = new Date();
+
+            
+            // console.log(secretNumber);
+
+            document.getElementById("range-setup").style.display = "none";
+            document.getElementById("game").style.display = "block";
+            document.getElementById("message").textContent = `Devinez un nombre entre ${minBound} et ${maxBound}`;
+            document.getElementById("result").textContent = "";
+            document.getElementById("input-number").value = "";
+        }
+
+        function checkGuess() {
+            const guess = parseInt(document.getElementById("input-number").value);
+            if (isNaN(guess) || guess < minBound || guess > maxBound) {
+                document.getElementById("message").textContent = `Entrez un nombre valide entre ${minBound} et ${maxBound}.`;
+                return;
+            }
+            attempts++;
+
+            if (guess === secretNumber) {
+                endTime = new Date();
+                const timeTaken = Math.floor((endTime - startTime) / 1000);
+                document.getElementById("result").innerHTML = `
+                    <h2>🎉 Bravo ! Vous avez trouvé le nombre ${secretNumber}.</h2>
+                    <p>Nombre de tentatives: <strong>${attempts}</strong></p>
+                    <p>Temps écoulé: <strong>${timeTaken} secondes</strong></p>
+                `;
+                document.getElementById("message").textContent = "";
+            } else if (guess > secretNumber) {
+                document.getElementById("message").textContent = "C'est plus grand 🔼.";
+            } else {
+                document.getElementById("message").textContent = "C'est plus petit 🔽.";
+            }
+
+            document.getElementById("input-number").value = "";
+        }
+
+        function resetAll() {
+            document.getElementById("range-setup").style.display = "block";
+            document.getElementById("game").style.display = "none";
+            document.getElementById("min-bound").value = "";
+            document.getElementById("max-bound").value = "";
+        }
+    </script>
+</body>
+</html>

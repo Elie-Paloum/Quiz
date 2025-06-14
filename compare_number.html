@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz de Comparaison 🔢</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2rem;
+            color: #ffeaa7;
+        }
+        .comparison {
+            font-size: 2rem;
+            margin: 30px 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .side {
+            background: #2d3436;
+            padding: 20px 40px;
+            border-radius: 15px;
+            min-width: 150px;
+        }
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.5rem;
+            background: #ff7675;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+        button:hover {
+            background: #d63031;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 1.5rem;
+            color: #55efc4;
+        }
+        .reset-btn {
+            margin-top: 20px;
+            background: #00cec9;
+            font-size: 1rem;
+            padding: 10px 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🔢 Quiz de Comparaison</h1>
+
+    <div id="setup">
+        <p>Nombre de questions :</p>
+        <input type="number" id="numQuestions" min="1" max="20" value="5" style="padding: 15px; border-radius: 10px; font-size: 1.2rem;">
+        <br><button onclick="startGame()">Commencer 🚀</button>
+    </div>
+
+    <div id="game" style="display:none;">
+        <div class="comparison">
+            <div class="side" id="leftExpr"></div>
+            <div class="side" id="rightExpr"></div>
+        </div>
+
+        <button onclick="submitAnswer('>')">></button>
+        <button onclick="submitAnswer('<')"><</button>
+
+        <div id="result"></div>
+        <button class="reset-btn" onclick="resetGame()">Nouvelle Partie 🔄</button>
+    </div>
+</div>
+
+<script>
+    let totalQuestions, currentQuestion = 0, score = 0;
+    let leftValue, rightValue;
+
+    function startGame() {
+        totalQuestions = parseInt(document.getElementById("numQuestions").value);
+        currentQuestion = 0;
+        score = 0;
+        document.getElementById("setup").style.display = "none";
+        document.getElementById("game").style.display = "block";
+        nextQuestion();
+    }
+
+    function randomOperator() {
+        const operators = ['+', '-', '*', '/'];
+        return operators[Math.floor(Math.random() * operators.length)];
+    }
+
+    function generateExpression() {
+        let num1 = Math.floor(Math.random() * 50) + 1;
+        let num2 = Math.floor(Math.random() * 50) + 1;
+        let op = randomOperator();
+
+        // éviter la division par zéro
+        if (op === '/' && num2 === 0) num2 = 1;
+
+        let expression = `${num1} ${op} ${num2}`;
+        let result;
+
+        // Calcul sécurisé
+        switch(op) {
+            case '+': result = num1 + num2; break;
+            case '-': result = num1 - num2; break;
+            case '*': result = num1 * num2; break;
+            case '/': result = Math.floor(num1 / num2); break;
+        }
+
+        return { expr: expression, value: result };
+    }
+
+    function nextQuestion() {
+        if (currentQuestion >= totalQuestions) {
+            showResult();
+            return;
+        }
+
+        document.getElementById("result").innerHTML = "";
+        const left = generateExpression();
+        const right = generateExpression();
+
+        leftValue = left.value;
+        rightValue = right.value;
+
+        document.getElementById("leftExpr").textContent = left.expr;
+        document.getElementById("rightExpr").textContent = right.expr;
+
+        currentQuestion++;
+    }
+
+    function submitAnswer(choice) {
+        let correct = (leftValue > rightValue && choice === '>') || (leftValue < rightValue && choice === '<');
+        if (correct) {
+            score++;
+            document.getElementById("result").innerHTML = "<p style='color:lightgreen;'>✔ Correct !</p>";
+        } else {
+            document.getElementById("result").innerHTML = `<p style='color:#ff7675;'>❌ Faux. ${leftValue} vs ${rightValue}</p>`;
+        }
+        setTimeout(nextQuestion, 1500);
+    }
+
+    function showResult() {
+        document.getElementById("leftExpr").innerHTML = `✅ Fin du quiz !<br>Score : ${score}/${totalQuestions} (${Math.round(score/totalQuestions*100)}%)`;
+        document.getElementById("rightExpr").innerHTML = ``;
+    }
+
+    function resetGame() {
+        document.getElementById("setup").style.display = "block";
+        document.getElementById("game").style.display = "none";
+    }
+</script>
+
+</body>
+</html>
