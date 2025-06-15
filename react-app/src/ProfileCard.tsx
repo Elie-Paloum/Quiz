@@ -1,5 +1,4 @@
-import React from 'react'
-import './ProfileCard.css' // <- Import custom styles
+import "./ProfileCard.css"; // <- Import custom styles
 
 function ProfileCard(props: any) {
   return (
@@ -12,14 +11,17 @@ function ProfileCard(props: any) {
         />
       </div>
       <div className="p-6 dark:bg-gray-900 hover:bg-white">
-        <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">{props.name}</h2>
+        <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+          {props.name}
+        </h2>
         <p className="text-gray-600 mt-2 dark:text-gray-100">{props.role}</p>
         <p className="text-gray-500 mt-4 dark:text-gray-100">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+          eiusmod tempor incididunt ut labore et dolore magna aliqua.
         </p>
       </div>
     </div>
-  )
+  );
 }
 
-export default ProfileCard
+export default ProfileCard;
