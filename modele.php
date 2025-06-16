@@ -111,7 +111,7 @@ function login($data) {
             return json_encode([
                 "return" => 0,
                 "message" => "Connexion réussie",
-                "user_id" => [$user['id'], $user["first_name"], $user["last_name"]] 
+                "user_id" => [$user['id'], $user["first_name"], $user["last_name"], $user["role"]] 
             ]);
         } else {
             // Mauvais mot de passe
