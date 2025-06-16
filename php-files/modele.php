@@ -57,6 +57,19 @@ $city = htmlspecialchars($structured['city']);
 $state = htmlspecialchars($structured['state']);
 $country = htmlspecialchars($structured['country']);
 $pdo = login_database();
+
+file_put_contents('debug.log', json_encode($data), FILE_APPEND);
+
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE email = :email");
+$stmt->execute(['email' => $email]);
+$count = $stmt->fetchColumn();
+
+if ($count > 0) {
+ 
+  echo json_encode(["return" => -1 ,"message" => "Email already exists"]);
+  exit();
+}
+
 try {
  
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -70,9 +83,9 @@ try {
     $street_number, $street_name, $postal_code, $city, $state, $country, $termsAccepted ? 1 : 0
   ]);
 
-  echo json_encode(["success" => true, "message" => "User registered successfully."]);
+  echo json_encode(["return" => 0, "message" => "User registered successfully."]);
 } catch (PDOException $e) {
-  echo json_encode(["error" => $e->getMessage()]);
+  echo json_encode(["return" => -1,"message" => "Database error."]);
 }
 
 

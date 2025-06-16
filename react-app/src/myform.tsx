@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Popover, PopoverContent } from "@/components/ui/popover";
 import { PopoverTrigger } from "./components/ui/popover";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, EyeIcon, EyeOffIcon } from "lucide-react";
 import { cn } from "./lib/utils";
 import { Calendar } from "./components/ui/calendar";
 import { RadioGroup, RadioGroupItem } from "./components/ui/radio-group";
@@ -26,6 +26,7 @@ import { Checkbox } from "./components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "./components/ui/dialog";
@@ -57,7 +58,7 @@ const formSchema = z.object({
 
 type SignUpFormValues = z.infer<typeof formSchema>;
 
-export function SignUpForm() {
+export function SignUpForm({ onSuccess }: { onSuccess: () => void }) {
   const [structuredAddress, setStructuredAddress] = useState({
     street_number: "",
     street_name: "",
@@ -66,6 +67,9 @@ export function SignUpForm() {
     state: "",
     country: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [signupSuccess, setSignupSuccess] = useState(false);
+  const [message, setMessage] = useState("");
 
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(formSchema),
@@ -79,21 +83,35 @@ export function SignUpForm() {
   });
 
   const onSubmit = async (values: SignUpFormValues) => {
-    const payLoad = {
-      ...values,
-      structuredAddress,
-    };
+    try {
+      const payLoad = {
+        ...values,
+        structuredAddress,
+      };
 
-    const response = await fetch("http://localhost:8085/modele.php", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payLoad),
-    });
-
-    console.log("Form submitted:", payLoad);
-    // Send `values` to your backend here
+      const response = await fetch("http://localhost:8085/modele.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payLoad),
+      });
+      const data = await response.json();
+      console.log(data);
+      if (data.return === -1) {
+        setMessage(data.message);
+        setSignupSuccess(true);
+      } else {
+        setMessage("Account created");
+        setSignupSuccess(true);
+        setTimeout(() => {
+          onSuccess();
+        }, 3000);
+      }
+    } catch (err) {
+      // Handle fetch or other errors
+      console.error("Error during form submission:", err);
+    }
   };
 
   return (
@@ -149,6 +167,23 @@ export function SignUpForm() {
                           type="email"
                           placeholder="john@example.com"
                           {...field}
+                          onBlur={async () => {
+                            const res = await fetch(
+                              "http://localhost:8085/check-email.php",
+                              {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ email: field.value }),
+                              }
+                            );
+                            const data = await res.json();
+                            if (data.exists) {
+                              form.setError("email", {
+                                type: "manual",
+                                message: "This email is already in use.",
+                              });
+                            }
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -161,13 +196,27 @@ export function SignUpForm() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="••••••••"
-                          {...field}
-                        />
-                      </FormControl>
+                      <div className="relative">
+                        <FormControl>
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            placeholder="••••••••"
+                            {...field}
+                          />
+                        </FormControl>
+                        <button
+                          type="button"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => setShowPassword((prev) => !prev)}
+                          className="absolute inset-y-0 right-0 px-3 flex items-center text-muted-foreground"
+                        >
+                          {showPassword ? (
+                            <EyeOffIcon size={18} />
+                          ) : (
+                            <EyeIcon size={18} />
+                          )}
+                        </button>
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -184,7 +233,7 @@ export function SignUpForm() {
                             <Button
                               variant={"outline"}
                               className={cn(
-                                "w-[205px] pl-3 text-left font-normal",
+                                "w-full  pl-3 text-left font-normal",
                                 !field.value && "text-muted-foreground"
                               )}
                             >
@@ -375,7 +424,7 @@ export function SignUpForm() {
                           <FormLabel className="text-sm font-normal flex-wrap">
                             <Dialog>
                               <DialogTrigger asChild>
-                                <span className="hover:underline cursor-pointer text-primary">
+                                <span className=" underline cursor-pointer text-primary">
                                   Accept terms & conditions.
                                 </span>
                               </DialogTrigger>
@@ -492,8 +541,26 @@ export function SignUpForm() {
                     </div>
                   )}
                 />
+
+                {
+                  <Dialog open={signupSuccess} onOpenChange={setSignupSuccess}>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>{message}</DialogTitle>
+                        <DialogDescription>
+                          This action cannot be undone. This will permanently
+                          delete your account and remove your data from our
+                          servers.
+                        </DialogDescription>
+                      </DialogHeader>
+                    </DialogContent>
+                  </Dialog>
+                }
               </div>
-              <Button type="submit" className="w-full">
+              <Button
+                type="submit"
+                className="w-full cursor-pointer active:bg-blue-700"
+              >
                 Sign Up
               </Button>
             </form>

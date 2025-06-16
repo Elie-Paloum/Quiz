@@ -1,55 +1,44 @@
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SignUpForm } from "@/myform";
+import { Login } from "./login";
+import { motion } from "framer-motion";
+import { useState } from "react";
+import { useAuth } from "./auth-context";
+import { Navigate } from "react-router-dom";
 
 export function LoginRegister() {
+  const [activeTab, setActiveTab] = useState("login");
+  const { isLoggedIn } = useAuth();
+
+  if (isLoggedIn) {
+    return <Navigate to="/about" replace />;
+  }
   return (
-    <div className="flex flex-1">
-      <div className="flex-1 flex flex-row flex-wrap justify-center align-center items-center gap-4">
-        <Tabs defaultValue="login">
-          <TabsList>
-            <TabsTrigger value="login">Login</TabsTrigger>
-            <TabsTrigger value="register">Register</TabsTrigger>
-          </TabsList>
-          <TabsContent value="login">
-            <Card className="w-[528px] h-[606px] bg-accent justify-between">
-              <CardHeader className="">
-                <CardTitle>Account</CardTitle>
-                <CardDescription>
-                  Make changes to your account here. Click save when you&apos;re
-                  done.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-6">
-                <div className="grid gap-3">
-                  <Label htmlFor="tabs-demo-name">Name</Label>
-                  <Input id="tabs-demo-name" defaultValue="Pedro Duarte" />
-                </div>
-                <div className="grid gap-3">
-                  <Label htmlFor="tabs-demo-username">Username</Label>
-                  <Input id="tabs-demo-username" defaultValue="@peduarte" />
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button>Save changes</Button>
-              </CardFooter>
-            </Card>
-          </TabsContent>
-          <TabsContent value="register">
-            <SignUpForm />
-          </TabsContent>
-        </Tabs>
+    <motion.div
+      className="flex-1 flex"
+      initial={{ opacity: 0, x: -50 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 50 }}
+      transition={{ duration: 0.4 }}
+    >
+      <div className="flex flex-col justify-center items-center flex-1 px-4 sm:px-6 md:px-8 w-full">
+        <div className="flex flex-col items-center justify-center w-full h-full">
+          <div className=" flex w-full  flex-col gap-6 justify-center items-center flex-1">
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="flex  justify-around">
+                <TabsTrigger value="login">Login</TabsTrigger>
+                <TabsTrigger value="register">Register</TabsTrigger>
+              </TabsList>
+              <TabsContent value="login">
+                <Login />
+              </TabsContent>
+              <TabsContent value="register">
+                <SignUpForm onSuccess={() => setActiveTab("login")} />
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
