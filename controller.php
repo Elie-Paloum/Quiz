@@ -27,8 +27,11 @@
   }
 
   function action_logout() {
-    logout();
-    header("Location: http://localhost:5173");
+    if(isset($_SESSION["user"])) {
+      session_destroy();
+    }
+    require 'config.php';
+    header("Location: ".$url_of_view);
     exit();
   }
 
@@ -108,6 +111,53 @@
     $id = isset($_GET['id']) ? intval($_GET['id']) : null;
 
     $json = users_delete($id);
+    
+    // envoyer le résultat
+    echo $json;
+  }
+
+  /**
+   * retourne les questions et leurs réponses correspondantes
+   * en format json
+   */
+  function action_admin_questions() {
+    header('Content-Type: application/json');
+
+    if(isset($_GET['nb_question'])) {
+      $json = get_n_questions($_GET['nb_question']);
+    } else {
+    // chercher toutes questions dans la base de données
+      $json = get_questions();
+    }
+    // envoyer le résultat de la requête
+    echo $json;
+  }
+
+  /**
+   * ajout d'une nouvelle question par un admin
+   */
+  function action_admin_questions_new() {
+    header('Content-Type: application/json');
+    // Récupérer les données du formulaire en format json
+    $input = file_get_contents('php://input');
+    $data = json_decode($input, true);
+    
+    // enregistrer les données dans la base
+    $json = questions_new($data);
+    
+    // envoyer le résultat
+    echo $json;
+  }
+
+  /**
+   * suppresion d'une question par un admin
+   */
+  function action_admin_questions_delete() {
+    header('Content-Type: application/json');
+    
+    $id = isset($_GET['id']) ? intval($_GET['id']) : null;    
+    // supprimer dans la base
+    $json = questions_delete($id);
     
     // envoyer le résultat
     echo $json;

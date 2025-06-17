@@ -1,5 +1,4 @@
 <?php
-
 // LOGIN, REGISTER AND LOGOUT
 
 /**
@@ -126,13 +125,6 @@ function login($data) {
             "message" => "Erreur serveur, veuillez réessayer plus tard"
         ]);
     }
-}
-
-/**
- * dédruit les données de sessions
- */
-function logout() {
-  session_destroy();
 }
 
 // USERS
@@ -299,5 +291,126 @@ function authors_delete($id) {
       echo json_encode(["return" => -1, "message" => "Database error."]);
   }
 }
+
+/**
+ * retourne en json les question et leur réponses correspondante
+ */
+function get_questions() {
+    $conn = login_database();
+
+    $stmt = $conn->prepare("SELECT * FROM questions");
+    $stmt->execute();
+
+    $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($questions as &$q) {
+        foreach ($q as $key => $value) {
+            if (!is_null($value)) {
+                $q[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+            }
+        }
+    }
+
+    return json_encode([
+        "return" => 0,
+        "questions" => $questions
+    ]);
+}
+
+/**
+ * returne nb_questions aléatoirement dans la base de données
+ */
+function get_n_questions($nb_questions) {
+    $conn = login_database();
+
+    // On force l'entier positif pour éviter les injections ou erreurs
+    $nb_questions = intval($nb_questions);
+    if ($nb_questions <= 0) {
+        return json_encode([
+            "return" => -1,
+            "message" => "Nombre de questions invalide."
+        ]);
+    }
+
+    $stmt = $conn->prepare("SELECT * FROM questions ORDER BY RAND() LIMIT ?");
+    $stmt->bindValue(1, $nb_questions, PDO::PARAM_INT);
+    $stmt->execute();
+
+    $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($questions as &$q) {
+        foreach ($q as $key => $value) {
+            if (!is_null($value)) {
+                $q[$key] = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+            }
+        }
+    }
+
+    return json_encode([
+        "return" => 0,
+        "questions" => $questions
+    ]);
+}
+
+
+
+/**
+ * ajoute data dans la base de données (table questions)
+ */
+function questions_new($data) {
+    if (!$data || !isset($data['question']) || !isset($data['true'])) {
+        echo json_encode(["return" => -1, "message" => "Input Error"]);
+        exit;
+    }
+
+    $question = htmlspecialchars($data['question']);
+    $true = filter_var($data['true'], FILTER_VALIDATE_BOOLEAN);
+
+    $conn = login_database();
+
+    try {
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        $stmt = $conn->prepare("INSERT INTO questions (question, `true`) VALUES (?, ?)");
+        $stmt->execute([$question, $true ? 1: 0]);
+
+        echo json_encode(["return" => 0, "message" => "Question added successfully."]);
+    } catch (PDOException $e) {
+        echo json_encode(["return" => -1, "message" => "Database error."]);
+    }
+}
+
+
+/**
+ * Supprime la question d'identifiant $id dans la base de donné(table questions)
+ */
+function questions_delete($id) {
+    if ($id == null) {
+        return json_encode(["return" => 404, "message" => "Bad request"]);
+    }
+
+    $pdo = login_database();
+
+    try {
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM questions WHERE id = ?");
+        $stmt->execute([$id]);
+        $count = $stmt->fetchColumn();
+
+        if ($count == 0) {
+            echo json_encode(["return" => -1, "message" => "Question not found."]);
+            exit;
+        }
+
+        $stmt = $pdo->prepare("DELETE FROM questions WHERE id = ?");
+        $stmt->execute([$id]);
+
+        echo json_encode(["return" => 0, "message" => "Question deleted successfully."]);
+    } catch (PDOException $e) {
+        echo json_encode(["return" => -1, "message" => "Database error."]);
+    }
+}
+
 
 ?>
