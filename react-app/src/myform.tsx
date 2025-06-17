@@ -233,7 +233,7 @@ export function SignUpForm({ onSuccess }: { onSuccess: () => void }) {
                             <Button
                               variant={"outline"}
                               className={cn(
-                                "w-full  pl-3 text-left font-normal",
+                                "w-full  pl-3 text-left font-normal bg-accent",
                                 !field.value && "text-muted-foreground"
                               )}
                             >

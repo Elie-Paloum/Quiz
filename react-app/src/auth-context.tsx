@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import type { ReactNode } from "react";
 
 interface AuthContextType {
   isLoggedIn: boolean;
@@ -9,11 +10,12 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loading, setLoading] = useState(true); // <-- Added
+  const [loading, setLoading] = useState(true);
 
   const login = () => setIsLoggedIn(true);
+
   const logout = () => {
     setIsLoggedIn(false);
     fetch("http://localhost:8085/logout.php", {
@@ -21,11 +23,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       credentials: "include",
     })
       .then((res) => res.json())
-
       .catch((err) => {
         console.error("Logout failed:", err);
       });
   };
+
   useEffect(() => {
     fetch("http://localhost:8085/check-session.php", {
       credentials: "include",
@@ -33,7 +35,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       .then((res) => res.json())
       .then((data) => {
         setIsLoggedIn(data.authenticated);
-        setLoading(false); // <-- Done loading
+        setLoading(false);
       })
       .catch(() => {
         setIsLoggedIn(false);
@@ -46,10 +48,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
-export const useAuth = () => {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
-  return ctx;
-};
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+}

@@ -11,12 +11,20 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    commonjsOptions: {
+      transformMixedEsModules: true,
+    },
+  },
   server: {
     host: "0.0.0.0",
     port: 5173,
     strictPort: true,
-
-    // 👇 Add your ngrok domain here
+    hmr: {
+      protocol: "ws",
+      host: "localhost",
+      port: 5173,
+    },
     allowedHosts: [
       "localhost",
       "127.0.0.1",

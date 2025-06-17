@@ -10,23 +10,9 @@ import { Link } from "react-router-dom";
 import { useRef } from "react";
 import { useAuth } from "./auth-context";
 import { Sidebar, UserCircleIcon } from "lucide-react";
-import {
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarTrigger,
-  useSidebar,
-} from "./components/ui/sidebar";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "./components/ui/sheet";
+import { useSidebar } from "./components/ui/sidebar";
+
+import { ModeToggle } from "./components/ui/mode-toggle";
 
 export function Nav() {
   const refTest = useRef<HTMLAnchorElement>(null);
@@ -47,7 +33,7 @@ export function Nav() {
                   refTest.current?.focus();
                 }, 0);
               }}
-              className="focus:bg-blue-500 focus:ring-2 active:ring-2 bg-blue-500 active:bg-blue-600 transition-all px-3 py-1.5 rounded-md text-nowrap"
+              className="bg-black hover:bg-black/90 text-white dark:bg-blue-500 focus:bg-black dark:focus:bg-blue-500 focus:text-white focus:ring-2 focus:ring-black/50 dark:focus:ring-blue-500/50 active:bg-black/90 dark:active:bg-blue-600 transition-all px-3 py-1.5 rounded-md text-nowrap"
             >
               <Link to="/quiz">Test your IQ!</Link>
             </NavigationMenuLink>
@@ -62,7 +48,7 @@ export function Nav() {
                   refAbout.current?.focus();
                 }, 0);
               }}
-              className="focus:bg-blue-500 focus:ring-2 active:ring-2 bg-blue-500 active:bg-blue-600 transition-all px-3 py-1.5 rounded-md text-nowrap"
+              className="bg-black hover:bg-black/90 text-white dark:bg-blue-500 focus:bg-black dark:focus:bg-blue-500 focus:text-white focus:ring-2 focus:ring-black/50 dark:focus:ring-blue-500/50 active:bg-black/90 dark:active:bg-blue-600 transition-all px-3 py-1.5 rounded-md text-nowrap"
             >
               <Link to="/about">About us</Link>
             </NavigationMenuLink>
@@ -92,6 +78,7 @@ export function Nav() {
             <UserCircleIcon size={24} />
           </Button>
         )}
+        <ModeToggle />
       </div>
     </div>
   );

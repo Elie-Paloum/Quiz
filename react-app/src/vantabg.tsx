@@ -1,9 +1,11 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { useTheme } from "@/components/ui/theme-provider";
 
 const VantaNetBackground = () => {
   const vantaRef = useRef<HTMLDivElement>(null);
   const effectRef = useRef<any>(null);
+  const { theme } = useTheme();
 
   useEffect(() => {
     let mounted = true;
@@ -22,8 +24,8 @@ const VantaNetBackground = () => {
             minWidth: 200.0,
             scale: 1.0,
             scaleMobile: 1.0,
-            color: 0x3fbbff,
-            backgroundColor: 0x1011e,
+            color: theme === "dark" ? 0x3fbbff : 0x1a1a1a,
+            backgroundColor: theme === "dark" ? 0x10111e : 0xffffff,
             points: 9.0,
             maxDistance: 22.0,
             spacing: 17.0,
@@ -41,7 +43,7 @@ const VantaNetBackground = () => {
         effectRef.current = null;
       }
     };
-  }, []);
+  }, [theme]);
 
   return (
     <div

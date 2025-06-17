@@ -1,14 +1,17 @@
-import Button from "@mui/material/Button";
+import { PowerOff } from "lucide-react";
 import { useAuth } from "./auth-context";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenu,
+  SidebarMenuButton,
   SidebarMenuItem,
 } from "./components/ui/sidebar";
+import { Link } from "react-router-dom";
 
 export function MySidebar() {
   const { isLoggedIn, logout } = useAuth();
@@ -25,17 +28,26 @@ export function MySidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  fullWidth
-                  onClick={logout}
-                ></Button>
+                <SidebarMenuButton asChild color="primary">
+                  <Link to="/dashboard">Dashboard</Link>
+                </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenuItem>
+          <SidebarMenuButton
+            variant="outline"
+            onClick={logout}
+            className="bg-red-500 text-white hover:bg-red-600 hover:text-white"
+          >
+            <PowerOff size={20} />
+            Logout
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarFooter>
     </Sidebar>
   );
 }

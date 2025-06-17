@@ -8,6 +8,8 @@ import { AnimatePresence } from "framer-motion";
 import VantaNetBackground from "./vantabg";
 import { LoginRegister } from "./loginregister";
 import { useAuth } from "./auth-context";
+import DashBoard from "./dashboard";
+// import DashBoard from "./dashboard";
 
 function App() {
   const location = useLocation();
@@ -23,8 +25,8 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col w-full text-sm sm:text-base overflow-x-hidden">
-      <VantaNetBackground />
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <VantaNetBackground />
         <div className=" px-3 sm:px-5 md:px-8 lg:px-12 pt-4">
           <Nav></Nav>
         </div>
@@ -35,6 +37,7 @@ function App() {
               <Route path="/quiz" element={<Quiz />} />
               <Route path="about" element={<About />} />
               <Route path="login+register" element={<LoginRegister />} />
+              <Route path="dashboard" element={<DashBoard />} />
             </Routes>
           </AnimatePresence>
         </div>
