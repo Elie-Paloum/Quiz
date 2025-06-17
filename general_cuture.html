@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz Culture Générale</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #2980b9, #6dd5fa);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        #questionText {
+            font-size: 1.4rem;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .btn-vrai { background-color: #27ae60; color: white; }
+        .btn-faux { background-color: #c0392b; color: white; }
+        .btn-restart { background-color: #f1c40f; color: black; margin-top: 20px; }
+        #feedback { margin-top: 15px; font-size: 1.2rem; }
+        #result { margin-top: 20px; font-size: 1.3rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quiz Vrai ou Faux – Culture Générale</h1>
+        <div id="questionText">Chargement des questions...</div>
+        <button class="btn-vrai" onclick="submitAnswer(true)">Vrai</button>
+        <button class="btn-faux" onclick="submitAnswer(false)">Faux</button>
+        <div id="feedback"></div>
+        <div id="result"></div>
+        <button class="btn-restart" onclick="startGame()">Nouvelle Partie</button>
+    </div>
+
+    <script>
+        let questions = [];
+        let current = 0;
+        let score = 0;
+
+        async function startGame() {
+            current = 0;
+            score = 0;
+            document.getElementById("feedback").textContent = "";
+            document.getElementById("result").textContent = "";
+            try {
+                const response = await fetch('http://localhost:8085/index.php/admin/questions?nb_questions=10');
+                const data = await response.json();
+
+                if (data.return !== 0) {
+                    document.getElementById("questionText").textContent = "Erreur de chargement des questions.";
+                    return;
+                }
+                questions = data.questions;
+                showQuestion();
+            } catch (err) {
+                document.getElementById("questionText").textContent = "Erreur réseau : " + err.message;
+            }
+        }
+
+        function showQuestion() {
+            if (current < questions.length) {
+                document.getElementById("questionText").textContent = `Question ${current + 1} : ${questions[current].question}`;
+                document.getElementById("feedback").textContent = "";
+            } else {
+                showResult();
+            }
+        }
+
+        function submitAnswer(userAnswer) {
+            const correct = questions[current].true == userAnswer;
+            if (correct) {
+                score++;
+                document.getElementById("feedback").textContent = "✅ Bonne réponse !";
+            } else {
+                document.getElementById("feedback").textContent = "❌ Mauvaise réponse.";
+            }
+            current++;
+            setTimeout(showQuestion, 1500);
+        }
+
+        function showResult() {
+            document.getElementById("questionText").textContent = "Quiz terminé !";
+            document.getElementById("result").textContent = `Score : ${score} / ${questions.length}`;
+        }
+
+        startGame();
+    </script>
+</body>
+</html>
