@@ -1,0 +1,3 @@
+Posons A = "http://localhost:5173"
+
+A/index.php/admin/questions  --> si nb_questions est défini dans la requête get, renvoie nb_questions et leurs réponses en format json
