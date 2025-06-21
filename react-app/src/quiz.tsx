@@ -1,5 +1,26 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import MentalMathQuiz from "./components/MentalMathQuiz";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+
+const sectionVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
 
 type Question = {
   question: string;
@@ -35,6 +56,7 @@ function Quiz() {
   const [score, setScore] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [showScore, setShowScore] = useState(false);
+  const [mode, setMode] = useState<"classic" | "mental">("classic");
 
   const current = questions[currentIndex];
 
@@ -43,8 +65,6 @@ function Quiz() {
     if (option === current.answer) {
       setScore(score + 1);
     }
-
-    // Wait then go to next
     setTimeout(() => {
       if (currentIndex + 1 < questions.length) {
         setCurrentIndex(currentIndex + 1);
@@ -55,49 +75,126 @@ function Quiz() {
     }, 1000);
   };
 
+  const modeDropdown = (
+    <div className="mb-6 flex flex-col gap-2 items-center">
+      <Select
+        value={mode}
+        onValueChange={(v) => setMode(v as "classic" | "mental")}
+      >
+        <SelectTrigger className="w-56">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="classic">Quiz Classique</SelectItem>
+          <SelectItem value="mental">Calcul Mental</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+  );
+
   return (
-    <motion.div
-      className="flex-1"
-      initial={{ opacity: 0, x: 50 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -50 }}
-      transition={{ duration: 0.4 }}
-    >
-      <div className="max-w-lg mx-auto mt-10 p-6 bg-white dark:bg-gray-900 shadow-lg rounded-lg text-center">
-        {showScore ? (
-          <div>
-            <h2 className="text-2xl font-bold mb-4">Quiz Completed!</h2>
-            <p className="text-lg">
-              Your score: {score} / {questions.length}
-            </p>
-          </div>
-        ) : (
-          <>
-            <h2 className="text-xl font-semibold mb-4">{current.question}</h2>
-            <div className="space-y-2">
-              {current.options.map((option) => (
-                <button
-                  key={option}
-                  onClick={() => handleAnswer(option)}
-                  disabled={!!selected}
-                  className={`w-full py-2 px-4 rounded border transition ${
-                    selected
-                      ? option === current.answer
-                        ? "bg-green-500 text-white"
-                        : option === selected
-                        ? "bg-red-500 text-white"
-                        : "bg-gray-200 dark:bg-gray-700"
-                      : "bg-gray-100 hover:bg-blue-200 dark:bg-gray-800 dark:hover:bg-blue-700"
-                  }`}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-          </>
-        )}
+    <div className="flex justify-center items-center min-h-[70vh] w-full px-2 py-8">
+      <div className="w-full max-w-md flex flex-col items-center">
+        {modeDropdown}
+        <AnimatePresence mode="wait">
+          {mode === "mental" ? (
+            <motion.div
+              key="mental"
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              variants={sectionVariants}
+              className="w-full"
+            >
+              <MentalMathQuiz />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="classic"
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              variants={sectionVariants}
+              className="w-full"
+            >
+              <Card className="bg-background/80 backdrop-blur-lg border border-white/20 dark:border-black/30 shadow-2xl">
+                <CardHeader>
+                  <CardTitle className="text-2xl text-center text-black dark:text-white">
+                    Quiz Classique
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-col gap-4 items-center">
+                  {showScore ? (
+                    <div className="mb-2 text-lg text-center">
+                      <div className="text-2xl font-bold mb-4">
+                        Quiz Completed!
+                      </div>
+                      <div className="mb-2">
+                        Your score: <strong>{score}</strong> /{" "}
+                        <strong>{questions.length}</strong>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="text-xl font-semibold mb-4 text-black dark:text-white">
+                        {current.question}
+                      </div>
+                      <div className="flex flex-col gap-2 w-full">
+                        {current.options.map((option) => {
+                          let btnClass =
+                            "w-full text-base font-semibold transition-all ";
+                          if (selected) {
+                            if (option === current.answer) {
+                              btnClass +=
+                                "!bg-green-500 !text-white !border-green-600 dark:!bg-green-600 dark:!border-green-400";
+                            } else if (option === selected) {
+                              btnClass +=
+                                "!bg-red-500 !text-white !border-red-600 dark:!bg-red-600 dark:!border-red-400";
+                            } else {
+                              btnClass +=
+                                "bg-gray-200 dark:bg-gray-700 text-black dark:text-white";
+                            }
+                          } else {
+                            btnClass +=
+                              "bg-gray-100 hover:bg-blue-200 dark:bg-gray-800 dark:hover:bg-blue-700 text-black dark:text-white";
+                          }
+                          return (
+                            <Button
+                              key={option}
+                              onClick={() => handleAnswer(option)}
+                              disabled={!!selected}
+                              className={btnClass}
+                              variant="default"
+                            >
+                              {option}
+                            </Button>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
+                </CardContent>
+                <CardFooter className="flex flex-col gap-2 items-center">
+                  {showScore && (
+                    <Button
+                      onClick={() => {
+                        setShowScore(false);
+                        setCurrentIndex(0);
+                        setScore(0);
+                        setSelected(null);
+                      }}
+                      className="w-full text-lg font-bold bg-cyan-500 hover:bg-cyan-600"
+                    >
+                      Nouvelle Partie 🔄
+                    </Button>
+                  )}
+                </CardFooter>
+              </Card>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-    </motion.div>
+    </div>
   );
 }
 

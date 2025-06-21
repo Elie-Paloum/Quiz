@@ -58,6 +58,18 @@ const formSchema = z.object({
 
 type SignUpFormValues = z.infer<typeof formSchema>;
 
+const getApiBase = () => {
+  if (import.meta.env.DEV) {
+    // Check if we're accessing from a mobile device
+    const isMobile =
+      window.location.hostname !== "localhost" &&
+      window.location.hostname !== "127.0.0.1";
+    return isMobile ? "http://172.20.10.3:8085" : "http://localhost:8085";
+  }
+  // Use your InfinityFree backend URL in production
+  return "https://logicalquiz.free.nf";
+};
+
 export function SignUpForm({ onSuccess }: { onSuccess: () => void }) {
   const [structuredAddress, setStructuredAddress] = useState({
     street_number: "",
@@ -89,7 +101,7 @@ export function SignUpForm({ onSuccess }: { onSuccess: () => void }) {
         structuredAddress,
       };
 
-      const response = await fetch("http://localhost:8085/modele.php", {
+      const response = await fetch(`${getApiBase()}/index.php/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -109,8 +121,9 @@ export function SignUpForm({ onSuccess }: { onSuccess: () => void }) {
         }, 3000);
       }
     } catch (err) {
-      // Handle fetch or other errors
       console.error("Error during form submission:", err);
+      setMessage("An error occurred. Please try again.");
+      setSignupSuccess(true);
     }
   };
 
@@ -127,7 +140,7 @@ export function SignUpForm({ onSuccess }: { onSuccess: () => void }) {
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-6 max-w-md mx-auto"
+              className="space-y-6 max-w-md mx-auto [&_.form-message]:h-5"
             >
               <div className="grid grid-cols-2 gap-10">
                 <FormField
@@ -169,7 +182,7 @@ export function SignUpForm({ onSuccess }: { onSuccess: () => void }) {
                           {...field}
                           onBlur={async () => {
                             const res = await fetch(
-                              "http://localhost:8085/check-email.php",
+                              `${getApiBase()}/index.php/check-email`,
                               {
                                 method: "POST",
                                 headers: { "Content-Type": "application/json" },
@@ -184,9 +197,15 @@ export function SignUpForm({ onSuccess }: { onSuccess: () => void }) {
                               });
                             }
                           }}
+                          onChange={(e) => {
+                            form.clearErrors("email");
+                            field.onChange(e);
+                          }}
                         />
                       </FormControl>
-                      <FormMessage />
+                      <div className="h-[20px]">
+                        <FormMessage />
+                      </div>
                     </FormItem>
                   )}
                 />
@@ -208,16 +227,18 @@ export function SignUpForm({ onSuccess }: { onSuccess: () => void }) {
                           type="button"
                           onMouseDown={(e) => e.preventDefault()}
                           onClick={() => setShowPassword((prev) => !prev)}
-                          className="absolute inset-y-0 right-0 px-3 flex items-center text-muted-foreground"
+                          className="absolute right-3 top-1/2 -translate-y-1/2"
                         >
                           {showPassword ? (
-                            <EyeOffIcon size={18} />
+                            <EyeOffIcon className="h-5 w-5 text-muted-foreground" />
                           ) : (
-                            <EyeIcon size={18} />
+                            <EyeIcon className="h-5 w-5 text-muted-foreground" />
                           )}
                         </button>
                       </div>
-                      <FormMessage />
+                      <div className="h-[20px]">
+                        <FormMessage />
+                      </div>
                     </FormItem>
                   )}
                 />
@@ -255,6 +276,13 @@ export function SignUpForm({ onSuccess }: { onSuccess: () => void }) {
                               date > new Date() || date < new Date("1900-01-01")
                             }
                             captionLayout="dropdown"
+                            defaultMonth={
+                              new Date(
+                                new Date().getFullYear() - 18,
+                                new Date().getMonth(),
+                                1
+                              )
+                            }
                           />
                         </PopoverContent>
                       </Popover>

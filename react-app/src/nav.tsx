@@ -9,7 +9,7 @@ import { Button } from "./components/ui/button";
 import { Link } from "react-router-dom";
 import { useRef } from "react";
 import { useAuth } from "./auth-context";
-import { Sidebar, UserCircleIcon } from "lucide-react";
+import { UserCircleIcon } from "lucide-react";
 import { useSidebar } from "./components/ui/sidebar";
 
 import { ModeToggle } from "./components/ui/mode-toggle";
@@ -17,7 +17,7 @@ import { ModeToggle } from "./components/ui/mode-toggle";
 export function Nav() {
   const refTest = useRef<HTMLAnchorElement>(null);
   const refAbout = useRef<HTMLAnchorElement>(null);
-  const { isLoggedIn, logout } = useAuth();
+  const { isLoggedIn } = useAuth();
   const { toggleSidebar } = useSidebar();
 
   return (
@@ -33,7 +33,7 @@ export function Nav() {
                   refTest.current?.focus();
                 }, 0);
               }}
-              className="bg-black hover:bg-black/90 text-white dark:bg-blue-500 focus:bg-black dark:focus:bg-blue-500 focus:text-white focus:ring-2 focus:ring-black/50 dark:focus:ring-blue-500/50 active:bg-black/90 dark:active:bg-blue-600 transition-all px-3 py-1.5 rounded-md text-nowrap"
+              className="bg-black hover:bg-black/90 shadow-none text-white dark:bg-blue-500 focus:bg-black dark:focus:bg-blue-500 focus:text-white focus:ring-2 focus:ring-black/50 dark:focus:ring-blue-500/50 active:bg-black/90 dark:active:bg-blue-600 transition-all px-3 py-1.5 rounded-md text-nowrap"
             >
               <Link to="/quiz">Test your IQ!</Link>
             </NavigationMenuLink>
@@ -48,9 +48,9 @@ export function Nav() {
                   refAbout.current?.focus();
                 }, 0);
               }}
-              className="bg-black hover:bg-black/90 text-white dark:bg-blue-500 focus:bg-black dark:focus:bg-blue-500 focus:text-white focus:ring-2 focus:ring-black/50 dark:focus:ring-blue-500/50 active:bg-black/90 dark:active:bg-blue-600 transition-all px-3 py-1.5 rounded-md text-nowrap"
+              className="bg-black hover:bg-black/90 shadow-none text-white dark:bg-blue-500 focus:bg-black dark:focus:bg-blue-500 focus:text-white focus:ring-2 focus:ring-black/50 dark:focus:ring-blue-500/50 active:bg-black/90 dark:active:bg-blue-600 transition-all px-3 py-1.5 rounded-md text-nowrap"
             >
-              <Link to="/about">About us</Link>
+              <Link to="/about">Historians</Link>
             </NavigationMenuLink>
           </NavigationMenuItem>
 
@@ -73,7 +73,7 @@ export function Nav() {
             onClick={toggleSidebar}
             variant="outline"
             size={"icon"}
-            className="dark:hover:bg-blue-500 text-nowrap"
+            className="dark:hover:bg-blue-500 text-nowrap cursor-pointer"
           >
             <UserCircleIcon size={24} />
           </Button>

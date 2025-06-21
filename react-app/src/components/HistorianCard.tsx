@@ -2,14 +2,11 @@ import type { Historian } from "../data/historians";
 import { motion } from "framer-motion";
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
 } from "./ui/drawer";
-import { Button } from "./ui/button";
-import { X } from "lucide-react";
 
 interface HistorianCardProps {
   historian: Historian;

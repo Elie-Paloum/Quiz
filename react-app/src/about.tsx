@@ -1,11 +1,36 @@
 import { motion } from "framer-motion";
-import { historians } from "./data/historians";
+
 import { HistorianCard } from "./components/HistorianCard";
 import { Input } from "./components/ui/input";
 import { Search } from "lucide-react";
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
+import type { Historian } from "./data/historians";
+
+const getApiBase = () => {
+  if (import.meta.env.DEV) {
+    const isMobile =
+      window.location.hostname !== "localhost" &&
+      window.location.hostname !== "127.0.0.1";
+    return isMobile ? "http://172.20.10.3:8085" : "http://localhost:8085";
+  }
+  return "https://logicalquiz.free.nf";
+};
 
 export function About() {
+  const [historians, setHistorians] = useState<Historian[]>([]);
+  useEffect(() => {
+    fetch(`${getApiBase()}/index.php/admin/authors`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch historians");
+        return res.json();
+      })
+      .then((data: Historian[]) => {
+        setHistorians(data);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }, []);
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -14,16 +39,17 @@ export function About() {
 
   const filteredHistorians = useMemo(() => {
     const searchLower = searchQuery.toLowerCase();
+
     return historians.filter(
       (historian) =>
-        historian.name.toLowerCase().includes(searchLower) ||
-        historian.role.toLowerCase().includes(searchLower) ||
-        historian.description.toLowerCase().includes(searchLower) ||
-        historian.achievements.some((achievement) =>
+        historian.name?.toLowerCase().includes(searchLower) ||
+        historian.role?.toLowerCase().includes(searchLower) ||
+        historian.description?.toLowerCase().includes(searchLower) ||
+        historian.achievements?.some((achievement: any) =>
           achievement.toLowerCase().includes(searchLower)
         )
     );
-  }, [searchQuery]);
+  }, [searchQuery, historians]);
 
   return (
     <motion.div

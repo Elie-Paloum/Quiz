@@ -40,6 +40,19 @@ const formSchema = z.object({
 
 type LogInFormValues = z.infer<typeof formSchema>;
 
+const getApiBase = () => {
+  if (import.meta.env.DEV) {
+    // Check if we're accessing from a mobile device
+    const isMobile =
+      window.location.hostname !== "localhost" &&
+      window.location.hostname !== "127.0.0.1";
+
+    return isMobile ? "http://172.20.10.3:8085" : "http://localhost:8085";
+  }
+  // Use your InfinityFree backend URL in production
+  return "https://logicalquiz.free.nf";
+};
+
 export function Login() {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -50,34 +63,35 @@ export function Login() {
       password: "",
     },
   });
-
+  console.log(getApiBase());
   const [loginSuccess, setLoginSuccess] = useState(false);
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState(false);
+  const [loginError, setLoginError] = useState("");
   const { login } = useAuth();
 
   const onSubmit = async (values: LogInFormValues) => {
-    const response = await fetch("http://localhost:8085/login.php", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(values),
-    });
-    console.log(values);
+    try {
+      const response = await fetch(`${getApiBase()}/index.php/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(values),
+      });
 
-    const data = await response.json();
-
-    if (data.return === -1) {
-      setError(true);
-    } else {
-      setError(false);
-      login();
+      const data = await response.json();
+      console.log(data);
+      if (data.return === 0) {
+        login(data.user);
+        setLoginError("");
+        setLoginSuccess(true);
+      } else {
+        setLoginSuccess(true);
+        setLoginError(data.message || "Login failed");
+      }
+    } catch (error) {
+      setLoginError("An error occurred. Please try again.");
     }
-
-    setMessage(data.message);
-    setLoginSuccess(true);
   };
 
   return (
@@ -153,14 +167,10 @@ export function Login() {
                 <Dialog open={loginSuccess} onOpenChange={setLoginSuccess}>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle className={error ? "text-red-500" : ""}>
-                        {message}
+                      <DialogTitle className={loginError ? "text-red-500" : ""}>
+                        {loginError || "Login successful"}
                       </DialogTitle>
-                      <DialogDescription>
-                        This action cannot be undone. This will permanently
-                        delete your account and remove your data from our
-                        servers.
-                      </DialogDescription>
+                      <DialogDescription></DialogDescription>
                     </DialogHeader>
                   </DialogContent>
                 </Dialog>

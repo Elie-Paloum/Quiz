@@ -14,7 +14,7 @@ import {
 import { Link } from "react-router-dom";
 
 export function MySidebar() {
-  const { isLoggedIn, logout } = useAuth();
+  const { isLoggedIn, logout, user } = useAuth();
 
   if (!isLoggedIn) {
     return null;
@@ -24,7 +24,7 @@ export function MySidebar() {
     <Sidebar side="right">
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel>{user?.first_name}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
@@ -32,6 +32,13 @@ export function MySidebar() {
                   <Link to="/dashboard">Dashboard</Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              {user?.role === "admin" && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild color="primary">
+                    <Link to="/admin">Manage Website</Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
