@@ -3,9 +3,7 @@
 
 /**
    *une fonction pour se connecter à la base de donnée
-   */
-
-
+ */
   function login_database(){
     require 'config.php';
     try {
@@ -26,52 +24,52 @@
   
     // Extract fields
     $firstName = htmlspecialchars($data['firstName']);
-$lastName = htmlspecialchars($data['lastName']);
-$email = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
-$password = password_hash($data['password'], PASSWORD_DEFAULT);
-$dob = date('Y-m-d', strtotime($data['dob'])); // Format for MySQL
-$gender = $data['gender'];
-$address = htmlspecialchars($data['address']);
-$termsAccepted = $data['acceptTerms'];
+    $lastName = htmlspecialchars($data['lastName']);
+    $email = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
+    $password = password_hash($data['password'], PASSWORD_DEFAULT);
+    $dob = date('Y-m-d', strtotime($data['dob'])); // Format for MySQL
+    $gender = $data['gender'];
+    $address = htmlspecialchars($data['address']);
+    $termsAccepted = $data['acceptTerms'];
+    
+    // Structured address
+    $structured = $data['structuredAddress'];
+    $street_number = htmlspecialchars($structured['street_number']);
+    $street_name = htmlspecialchars($structured['street_name']);
+    $postal_code = htmlspecialchars($structured['postal_code']);
+    $city = htmlspecialchars($structured['city']);
+    $state = htmlspecialchars($structured['state']);
+    $country = htmlspecialchars($structured['country']);
+    $pdo = login_database();
 
-// Structured address
-$structured = $data['structuredAddress'];
-$street_number = htmlspecialchars($structured['street_number']);
-$street_name = htmlspecialchars($structured['street_name']);
-$postal_code = htmlspecialchars($structured['postal_code']);
-$city = htmlspecialchars($structured['city']);
-$state = htmlspecialchars($structured['state']);
-$country = htmlspecialchars($structured['country']);
-$pdo = login_database();
 
-
-$stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE email = :email");
-$stmt->execute(['email' => $email]);
-$count = $stmt->fetchColumn();
-
-if ($count > 0) {
- 
-  echo json_encode(["return" => -1 ,"message" => "Email already exists"]);
-  exit();
-}
-
-try {
- 
-  $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-  $stmt = $pdo->prepare("INSERT INTO users 
-    (first_name, last_name, email, password, dob, gender, full_address, street_number, street_name, postal_code, city, state, country, accept_terms) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
-  $stmt->execute([
-    $firstName, $lastName, $email, $password, $dob, $gender, $address,
-    $street_number, $street_name, $postal_code, $city, $state, $country, $termsAccepted ? 1 : 0
-  ]);
-
-  echo json_encode(["return" => 0, "message" => "User registered successfully."]);
-} catch (PDOException $e) {
-  echo json_encode(["return" => -1,"message" => "Database error."]);
-}
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE email = :email");
+    $stmt->execute(['email' => $email]);
+    $count = $stmt->fetchColumn();
+    
+    if ($count > 0) {
+     
+      echo json_encode(["return" => -1 ,"message" => "Email already exists"]);
+      exit();
+    }
+    
+    try {
+     
+      $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    
+      $stmt = $pdo->prepare("INSERT INTO users 
+        (first_name, last_name, email, password, dob, gender, full_address, street_number, street_name, postal_code, city, state, country, accept_terms) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+  
+      $stmt->execute([
+        $firstName, $lastName, $email, $password, $dob, $gender, $address,
+        $street_number, $street_name, $postal_code, $city, $state, $country, $termsAccepted ? 1 : 0
+      ]);
+    
+      echo json_encode(["return" => 0, "message" => "User registered successfully."]);
+    } catch (PDOException $e) {
+    echo json_encode(["return" => -1,"message" => "Database error."]);
+  }
 }
 
 function login($data) {
@@ -118,11 +116,6 @@ function login($data) {
     }
 }
 
-
-
-
-
-
 // USERS
 
 /**
@@ -150,7 +143,8 @@ function get_users() {
  */
 function users_delete($id) {
   if($id == null) {
-    return json_encode(["return" => 404, "message" => "Bad request"]);
+    http_response_code(404);
+    return json_encode(["return" => -1, "message" => "Bad request"]);
   }
 
   $pdo = login_database();
@@ -163,7 +157,8 @@ function users_delete($id) {
     $count = $stmt->fetchColumn();
 
     if ($count == 0) {
-        echo json_encode(["return" => -1, "message" => "User not found."]);
+        http_response_code(404);
+        return json_encode(["return" => -1, "message" => "Bad request"]);
         exit;
     }
 
@@ -179,7 +174,8 @@ function users_delete($id) {
 
 function users_make_admin($id) {
   if ($id == null) {
-    return json_encode(["return" => 404, "message" => "Bad request"]);
+    http_response_code(404);
+    return json_encode(["return" => -1, "message" => "Bad request"]);
   }
 
   $pdo = login_database();
@@ -202,7 +198,8 @@ function users_make_admin($id) {
 
 function users_toggle_role($id) {
   if ($id == null) {
-    return json_encode(["return" => 404, "message" => "Bad request"]);
+    http_response_code(404);
+    return json_encode(["return" => -1, "message" => "Bad request"]);
   }
 
   $pdo = login_database();
