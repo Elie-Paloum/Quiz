@@ -56,6 +56,12 @@
   // suppression d'un utilisateur par un admin (GET id)
   } else if($uri == "index.php/admin/users/delete") {
     action_admin_users_delete();
+  // make a user admin
+  } else if($uri == "index.php/admin/users/make-admin") {
+    action_admin_users_make_admin();
+  // toggle user role between admin and user
+  } else if($uri == "index.php/admin/users/toggle-role") {
+    action_admin_users_toggle_role();
   }
   // retourne toutes les questions (culture général) et leurs réponses(GET)
   // si nb_question est défini dans la requête, nb_questions de questions sont transmis

@@ -6,6 +6,7 @@ import App from "./App.tsx";
 import { AuthProvider } from "./auth-context.tsx";
 import { SidebarProvider } from "./components/ui/sidebar.tsx";
 import { MySidebar } from "./mysidebar.tsx";
+import { Toaster } from "sonner";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -14,6 +15,7 @@ createRoot(document.getElementById("root")!).render(
         <SidebarProvider defaultOpen={false}>
           <App />
           <MySidebar />
+          <Toaster />
         </SidebarProvider>
       </AuthProvider>
     </BrowserRouter>

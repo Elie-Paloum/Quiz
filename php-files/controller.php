@@ -136,6 +136,20 @@
     echo $json;
   }
 
+  function action_admin_users_make_admin() {
+    header('Content-Type: application/json');
+    $id = isset($_GET['id']) ? intval($_GET['id']) : null;
+    $json = users_make_admin($id);
+    echo $json;
+  }
+
+  function action_admin_users_toggle_role() {
+    header('Content-Type: application/json');
+    $id = isset($_GET['id']) ? intval($_GET['id']) : null;
+    $json = users_toggle_role($id);
+    echo $json;
+  }
+
   /**
    * retourne les questions et leurs réponses correspondantes
    * en format json

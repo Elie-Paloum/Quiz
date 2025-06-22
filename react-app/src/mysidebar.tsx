@@ -29,13 +29,18 @@ export function MySidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild color="primary">
+                  <Link to="/">Home</Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild color="primary">
                   <Link to="/dashboard">Dashboard</Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               {user?.role === "admin" && (
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild color="primary">
-                    <Link to="/admin">Manage Website</Link>
+                    <Link to="/admin/users">Manage Users</Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               )}

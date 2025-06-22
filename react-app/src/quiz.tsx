@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import MentalMathQuiz from "./components/MentalMathQuiz";
+import { ComparisonQuiz } from "./components/ComparisonQuiz";
+import { TrueFalseQuiz } from "./components/TrueFalseQuiz";
+import { LogicalSequencesQuiz } from "./components/LogicalSequencesQuiz";
+import { NumberGuessingGame } from "./components/NumberGuessingGame";
 import {
   Select,
   SelectTrigger,
@@ -16,6 +20,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 30 },
@@ -56,7 +61,9 @@ function Quiz() {
   const [score, setScore] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [showScore, setShowScore] = useState(false);
-  const [mode, setMode] = useState<"classic" | "mental">("classic");
+  const [mode, setMode] = useState<
+    "classic" | "mental" | "comparison" | "truefalse" | "sequences" | "guessing"
+  >("classic");
 
   const current = questions[currentIndex];
 
@@ -72,21 +79,35 @@ function Quiz() {
       } else {
         setShowScore(true);
       }
-    }, 1000);
+    }, 3000);
   };
 
   const modeDropdown = (
     <div className="mb-6 flex flex-col gap-2 items-center">
       <Select
         value={mode}
-        onValueChange={(v) => setMode(v as "classic" | "mental")}
+        onValueChange={(v) =>
+          setMode(
+            v as
+              | "classic"
+              | "mental"
+              | "comparison"
+              | "truefalse"
+              | "sequences"
+              | "guessing"
+          )
+        }
       >
         <SelectTrigger className="w-56">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="classic">Quiz Classique</SelectItem>
-          <SelectItem value="mental">Calcul Mental</SelectItem>
+          <SelectItem value="classic">Classic Quiz</SelectItem>
+          <SelectItem value="mental">Mental Math</SelectItem>
+          <SelectItem value="comparison">Comparison Quiz</SelectItem>
+          <SelectItem value="truefalse">True or False Quiz</SelectItem>
+          <SelectItem value="sequences">Logical Sequences Quiz</SelectItem>
+          <SelectItem value="guessing">Number Guessing Game</SelectItem>
         </SelectContent>
       </Select>
     </div>
@@ -108,6 +129,50 @@ function Quiz() {
             >
               <MentalMathQuiz />
             </motion.div>
+          ) : mode === "comparison" ? (
+            <motion.div
+              key="comparison"
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              variants={sectionVariants}
+              className="w-full"
+            >
+              <ComparisonQuiz />
+            </motion.div>
+          ) : mode === "truefalse" ? (
+            <motion.div
+              key="truefalse"
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              variants={sectionVariants}
+              className="w-full"
+            >
+              <TrueFalseQuiz />
+            </motion.div>
+          ) : mode === "sequences" ? (
+            <motion.div
+              key="sequences"
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              variants={sectionVariants}
+              className="w-full"
+            >
+              <LogicalSequencesQuiz />
+            </motion.div>
+          ) : mode === "guessing" ? (
+            <motion.div
+              key="guessing"
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              variants={sectionVariants}
+              className="w-full"
+            >
+              <NumberGuessingGame />
+            </motion.div>
           ) : (
             <motion.div
               key="classic"
@@ -120,7 +185,7 @@ function Quiz() {
               <Card className="bg-background/80 backdrop-blur-lg border border-white/20 dark:border-black/30 shadow-2xl">
                 <CardHeader>
                   <CardTitle className="text-2xl text-center text-black dark:text-white">
-                    Quiz Classique
+                    Classic Quiz
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="flex flex-col gap-4 items-center">
@@ -171,6 +236,23 @@ function Quiz() {
                           );
                         })}
                       </div>
+                      <div className="space-y-2 w-full">
+                        <div className="text-center space-y-1">
+                          <div className="text-base text-black dark:text-white">
+                            Question {currentIndex + 1} / {questions.length}
+                          </div>
+                          <div className="text-base text-black dark:text-white">
+                            Score: {score}
+                          </div>
+                        </div>
+                        <Progress
+                          value={Math.min(
+                            (currentIndex / (questions.length - 1)) * 80,
+                            80
+                          )}
+                          className="w-full"
+                        />
+                      </div>
                     </>
                   )}
                 </CardContent>
@@ -185,7 +267,7 @@ function Quiz() {
                       }}
                       className="w-full text-lg font-bold bg-cyan-500 hover:bg-cyan-600"
                     >
-                      Nouvelle Partie 🔄
+                      New Game 🔄
                     </Button>
                   )}
                 </CardFooter>

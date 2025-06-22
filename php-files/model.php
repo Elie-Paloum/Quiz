@@ -177,6 +177,65 @@ function users_delete($id) {
   }
 }
 
+function users_make_admin($id) {
+  if ($id == null) {
+    return json_encode(["return" => 404, "message" => "Bad request"]);
+  }
+
+  $pdo = login_database();
+
+  try {
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    $stmt = $pdo->prepare("UPDATE users SET role = 'admin' WHERE id = ?");
+    $stmt->execute([$id]);
+
+    if ($stmt->rowCount() === 0) {
+      return json_encode(["return" => -1, "message" => "User not found or already admin."]);
+    }
+
+    return json_encode(["return" => 0, "message" => "User promoted to admin."]);
+  } catch (PDOException $e) {
+    return json_encode(["return" => -1, "message" => "Database error."]);
+  }
+}
+
+function users_toggle_role($id) {
+  if ($id == null) {
+    return json_encode(["return" => 404, "message" => "Bad request"]);
+  }
+
+  $pdo = login_database();
+
+  try {
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    // First, get the current role
+    $stmt = $pdo->prepare("SELECT role FROM users WHERE id = ?");
+    $stmt->execute([$id]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$user) {
+      return json_encode(["return" => -1, "message" => "User not found."]);
+    }
+
+    // Toggle the role
+    $newRole = $user['role'] === 'admin' ? 'user' : 'admin';
+    $action = $newRole === 'admin' ? 'promoted to admin' : 'demoted to user';
+
+    $stmt = $pdo->prepare("UPDATE users SET role = ? WHERE id = ?");
+    $stmt->execute([$newRole, $id]);
+
+    return json_encode([
+      "return" => 0, 
+      "message" => "User $action successfully.",
+      "newRole" => $newRole
+    ]);
+  } catch (PDOException $e) {
+    return json_encode(["return" => -1, "message" => "Database error."]);
+  }
+}
+
 
 // AUTHORS
 

@@ -12,11 +12,12 @@ import DashBoard from "./dashboard";
 import { LoginRequired } from "./components/LoginRequired";
 import Home from "./Home";
 import MyTable from "./mytable";
+import Dashboard from "./dashboard";
 // import DashBoard from "./dashboard";
 
 function App() {
   const location = useLocation();
-  const { loading, isLoggedIn } = useAuth();
+  const { loading, isLoggedIn, user } = useAuth();
 
   if (loading) {
     return (
@@ -46,7 +47,8 @@ function App() {
                 element={isLoggedIn ? <About /> : <LoginRequired />}
               />
               <Route path="login+register" element={<LoginRegister />} />
-              <Route path="dashboard" element={<MyTable />} />
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="admin/users" element={<MyTable />} />
             </Routes>
           </AnimatePresence>
         </div>

@@ -44,7 +44,7 @@ import {
   EyeOff,
 } from "lucide-react";
 import { Navigate } from "react-router-dom";
-import { Textarea } from "./components/ui/textarea";
+
 import { motion } from "framer-motion";
 
 const getApiBase = () => {
@@ -301,15 +301,12 @@ export default function DashBoard() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="security" className="flex items-center gap-2">
               <Lock className="h-4 w-4" />
               Security
             </TabsTrigger>
-            <TabsTrigger value="historians" className="flex items-center gap-2">
-              <History className="h-4 w-4" />
-              Historians
-            </TabsTrigger>
+
             <TabsTrigger value="danger" className="flex items-center gap-2">
               <AlertTriangle className="h-4 w-4" />
               Danger Zone
@@ -479,87 +476,6 @@ export default function DashBoard() {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
-
-          <TabsContent value="historians" className="mt-6">
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle>Manage Historians</CardTitle>
-                      <CardDescription>
-                        Add, edit, or remove computer science historians
-                      </CardDescription>
-                    </div>
-                    <Button>
-                      <Plus className="mr-2 h-4 w-4" />
-                      Add Historian
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {/* Sample Historian Cards */}
-                    <Card>
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4">
-                            <img
-                              src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Ada_Byron_daguerreotype_by_Antoine_Claudet_1843_or_1850.jpg"
-                              alt="Ada Lovelace"
-                              className="w-16 h-16 rounded-full object-cover"
-                            />
-                            <div>
-                              <h3 className="font-medium">Ada Lovelace</h3>
-                              <p className="text-sm text-muted-foreground">
-                                First Computer Programmer
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex gap-2">
-                            <Button variant="outline" size="icon">
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                            <Button variant="outline" size="icon">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4">
-                            <img
-                              src="https://upload.wikimedia.org/wikipedia/commons/a/a1/Alan_Turing_Aged_16.jpg"
-                              alt="Alan Turing"
-                              className="w-16 h-16 rounded-full object-cover"
-                            />
-                            <div>
-                              <h3 className="font-medium">Alan Turing</h3>
-                              <p className="text-sm text-muted-foreground">
-                                Father of Computer Science
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex gap-2">
-                            <Button variant="outline" size="icon">
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                            <Button variant="outline" size="icon">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
           </TabsContent>
 
           <TabsContent value="danger" className="mt-6">

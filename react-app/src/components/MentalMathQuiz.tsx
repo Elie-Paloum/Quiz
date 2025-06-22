@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Select,
@@ -25,6 +26,7 @@ import {
   AlertDialogDescription,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+import { useNumQuestions } from "../hooks/useNumQuestions";
 
 // Define the type for a math question
 interface MathQuestion {
@@ -39,7 +41,9 @@ const sectionVariants = {
 
 export default function MentalMathQuiz() {
   const [step, setStep] = useState<"setup" | "quiz" | "summary">("setup");
-  const [nbQuestions, setNbQuestions] = useState<number>(5);
+  const { numQuestions: nbQuestions, NumQuestionsInput } = useNumQuestions({
+    max: 50,
+  });
   const [level, setLevel] = useState<number>(1);
   const [questions, setQuestions] = useState<MathQuestion[]>([]);
   const [current, setCurrent] = useState<number>(0);
@@ -171,12 +175,11 @@ export default function MentalMathQuiz() {
         setAnswer("");
         setFeedback("");
       }
-    }, 1500);
+    }, 3000);
   };
 
   const resetGame = () => {
     setStep("setup");
-    setNbQuestions(5);
     setLevel(1);
     setAnswer("");
   };
@@ -211,19 +214,7 @@ export default function MentalMathQuiz() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col gap-4">
-                <div>
-                  <Label className="mb-1 font-semibold text-gray-700 dark:text-gray-200">
-                    Number of questions:
-                  </Label>
-                  <Input
-                    type="number"
-                    value={nbQuestions}
-                    min={1}
-                    max={50}
-                    onChange={(e) => setNbQuestions(parseInt(e.target.value))}
-                    className="bg-white/80 dark:bg-black/40 border border-gray-300 dark:border-gray-700 text-black dark:text-white"
-                  />
-                </div>
+                {NumQuestionsInput}
                 <div>
                   <Label className="mb-1 font-semibold text-gray-700 dark:text-gray-200">
                     Level:
@@ -307,6 +298,20 @@ export default function MentalMathQuiz() {
                 </div>
                 <div className="text-lg font-semibold text-yellow-400 min-h-[2rem]">
                   {feedback}
+                </div>
+                <div className="space-y-2 w-full">
+                  <div className="text-center space-y-1">
+                    <div className="text-base text-black dark:text-white">
+                      Score: {score}
+                    </div>
+                  </div>
+                  <Progress
+                    value={Math.min(
+                      (current / (questions.length - 1)) * 80,
+                      80
+                    )}
+                    className="w-full"
+                  />
                 </div>
               </CardContent>
             </Card>

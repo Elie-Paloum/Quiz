@@ -42,6 +42,7 @@
     "@tabler/icons-react": "^3.34.0",
     "@tailwindcss/vite": "^4.1.8",
     "@tanstack/react-table": "^8.21.3",
+    "@tanstack/table-core": "^8.21.3",
     "Tabs": "link:@mui/material/Tabs",
     "class-variance-authority": "^0.7.1",
     "classnames": "^2.5.1",
