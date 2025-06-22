@@ -72,6 +72,10 @@
    * envoie les auteurs au client (admin)
    */
   function action_admin_authors() {
+    if(!isset($_SESSION["user"]) || $_SESSION['user']["role"] != "admin") {
+      http_response_code(403);
+      return json_encode(["return" => -1, "message" => "Forbidden"]);
+    }
     header('Content-Type: application/json');
     $json = get_authors();
     // envoyer le résultat de la requête
@@ -83,6 +87,10 @@
    */
   function action_admin_authors_new() {
     header('Content-Type: application/json');
+    if(!isset($_SESSION["user"]) || $_SESSION['user']["role"] != "admin") {
+      http_response_code(403);
+      return json_encode(["return" => -1, "message" => "Forbidden"]);
+    }
     // Récupérer les données du formulaire en format json
     $input = file_get_contents('php://input');
     $data = json_decode($input, true);
@@ -99,7 +107,10 @@
    */
   function action_admin_authors_delete() {
     header('Content-Type: application/json');
-    
+    if(!isset($_SESSION["user"]) || $_SESSION['user']["role"] != "admin") {
+      http_response_code(403);
+      return json_encode(["return" => -1, "message" => "Forbidden"]);
+    }
     // supprimer dans la base
     $id = isset($_GET['id']) ? intval($_GET['id']) : null;
 
@@ -116,6 +127,10 @@
    */
   function action_admin_users() {
     header('Content-Type: application/json');
+    if(!isset($_SESSION["user"]) || $_SESSION['user']["role"] != "admin") {
+      http_response_code(403);
+      return json_encode(["return" => -1, "message" => "Forbidden"]);
+    }
     $json = get_users();
     // envoyer le résultat de la requête
     echo $json;
@@ -126,7 +141,10 @@
    */
   function action_admin_users_delete() {
     header('Content-Type: application/json');
-    
+    if(!isset($_SESSION["user"]) || $_SESSION['user']["role"] != "admin") {
+      http_response_code(403);
+      return json_encode(["return" => -1, "message" => "Forbidden"]);
+    }
     // supprimer dans la base
     $id = isset($_GET['id']) ? intval($_GET['id']) : null;
 
@@ -138,6 +156,10 @@
 
   function action_admin_users_make_admin() {
     header('Content-Type: application/json');
+    if(!isset($_SESSION["user"]) || $_SESSION['user']["role"] != "admin") {
+      http_response_code(403);
+      return json_encode(["return" => -1, "message" => "Forbidden"]);
+    }
     $id = isset($_GET['id']) ? intval($_GET['id']) : null;
     $json = users_make_admin($id);
     echo $json;
@@ -145,6 +167,10 @@
 
   function action_admin_users_toggle_role() {
     header('Content-Type: application/json');
+    if(!isset($_SESSION["user"]) || $_SESSION['user']["role"] != "admin") {
+      http_response_code(403);
+      return json_encode(["return" => -1, "message" => "Forbidden"]);
+    }
     $id = isset($_GET['id']) ? intval($_GET['id']) : null;
     $json = users_toggle_role($id);
     echo $json;
@@ -156,7 +182,10 @@
    */
   function action_admin_questions() {
     header('Content-Type: application/json');
-
+    if(!isset($_SESSION["user"]) || $_SESSION['user']["role"] != "admin") {
+      http_response_code(403);
+      return json_encode(["return" => -1, "message" => "Forbidden"]);
+    }
     if(isset($_GET['nb_question'])) {
       $json = get_n_questions($_GET['nb_question']);
     } else {
@@ -172,6 +201,10 @@
    */
   function action_admin_questions_new() {
     header('Content-Type: application/json');
+    if(!isset($_SESSION["user"]) || $_SESSION['user']["role"] != "admin") {
+      http_response_code(403);
+      return json_encode(["return" => -1, "message" => "Forbidden"]);
+    }
     // Récupérer les données du formulaire en format json
     $input = file_get_contents('php://input');
     $data = json_decode($input, true);
@@ -188,7 +221,10 @@
    */
   function action_admin_questions_delete() {
     header('Content-Type: application/json');
-    
+    if(!isset($_SESSION["user"]) || $_SESSION['user']["role"] != "admin") {
+      http_response_code(403);
+      return json_encode(["return" => -1, "message" => "Forbidden"]);
+    }
     $id = isset($_GET['id']) ? intval($_GET['id']) : null;    
     // supprimer dans la base
     $json = questions_delete($id);
@@ -202,7 +238,10 @@
    */
   function action_delete_account() {
     header('Content-Type: application/json');
-    
+    if(!isset($_SESSION["user"]) || $_SESSION['user']["role"] != "admin") {
+      http_response_code(403);
+      return json_encode(["return" => -1, "message" => "Forbidden"]);
+    }
     // Call the model function to delete the account
     delete_account();
   }
@@ -212,7 +251,10 @@
    */
   function action_change_password() {
     header('Content-Type: application/json');
-    
+    if(!isset($_SESSION["user"]) || $_SESSION['user']["role"] != "admin") {
+      http_response_code(403);
+      return json_encode(["return" => -1, "message" => "Forbidden"]);
+    }
     // Get the JSON data from the request
     $input = file_get_contents('php://input');
     $data = json_decode($input, true);
@@ -226,7 +268,10 @@
    */
   function action_verify_password() {
     header('Content-Type: application/json');
-    
+    if(!isset($_SESSION["user"]) || $_SESSION['user']["role"] != "admin") {
+      http_response_code(403);
+      return json_encode(["return" => -1, "message" => "Forbidden"]);
+    }
     // Get the JSON data from the request
     $input = file_get_contents('php://input');
     $data = json_decode($input, true);
@@ -234,7 +279,5 @@
     // Call the model function to verify the password
     verify_current_password($data);
   }
-
-  
 
 ?>
