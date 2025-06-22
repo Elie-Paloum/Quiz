@@ -238,9 +238,8 @@
    */
   function action_delete_account() {
     header('Content-Type: application/json');
-    if(!isset($_SESSION["user"]) || $_SESSION['user']["role"] != "admin") {
-      http_response_code(403);
-      return json_encode(["return" => -1, "message" => "Forbidden"]);
+    if(!isset($_SESSION["user"])) {
+      return json_encode(["return" => -1, "message" => "you have to be connected"]);
     }
     // Call the model function to delete the account
     delete_account();
@@ -251,9 +250,8 @@
    */
   function action_change_password() {
     header('Content-Type: application/json');
-    if(!isset($_SESSION["user"]) || $_SESSION['user']["role"] != "admin") {
-      http_response_code(403);
-      return json_encode(["return" => -1, "message" => "Forbidden"]);
+    if(!isset($_SESSION["user"])) {
+      return json_encode(["return" => -1, "message" => "you have to be connected"]);
     }
     // Get the JSON data from the request
     $input = file_get_contents('php://input');
@@ -268,9 +266,8 @@
    */
   function action_verify_password() {
     header('Content-Type: application/json');
-    if(!isset($_SESSION["user"]) || $_SESSION['user']["role"] != "admin") {
-      http_response_code(403);
-      return json_encode(["return" => -1, "message" => "Forbidden"]);
+    if(!isset($_SESSION["user"])) {
+      return json_encode(["return" => -1, "message" => "you have to be connected"]);
     }
     // Get the JSON data from the request
     $input = file_get_contents('php://input');
