@@ -339,7 +339,7 @@ export function SignUpForm({ onSuccess }: { onSuccess: () => void }) {
                       <FormLabel>Address</FormLabel>
                       <FormControl>
                         <GooglePlacesAutocomplete
-                          apiKey="AIzaSyBbVD3ug_peZON5SWXKJ-oSqV8mOZyEX-g"
+                          apiKey="API_KEY_EXAMPLE"
                           selectProps={{
                             value: field.value
                               ? { label: field.value, value: field.value }
